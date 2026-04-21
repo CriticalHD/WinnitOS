@@ -31,6 +31,58 @@ body {
     filter: blur(12px) brightness(0.9);
 }
 
+.nav-circle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.nav-circle:hover {
+    background: rgba(255,255,255,0.14);
+    transform: translateY(-50%) scale(1.08);
+}
+
+/* push them OUTSIDE the login box */
+.nav-circle.left {
+    left: calc(50% - 220px);
+}
+
+.nav-circle.right {
+    right: calc(50% - 220px);
+}
+
+/* arrow direction clarity */
+.nav-circle .arrow {
+    font-size: 26px;
+    color: white;
+    opacity: 0.9;
+    user-select: none;
+}
+
+/* optional: slight directional bias */
+.nav-circle.left .arrow {
+    transform: translateX(-1px);
+}
+
+.nav-circle.right .arrow {
+    transform: translateX(1px);
+}
+    
 .overlay {
     position: absolute;
     width: 100%;
