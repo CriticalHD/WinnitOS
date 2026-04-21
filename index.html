@@ -35,52 +35,47 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 56px;
-    height: 56px;
+
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
 
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255,255,255,0.08);
     backdrop-filter: blur(14px);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    color: rgba(255,255,255,0.9);
+    font-size: 28px;
+    font-weight: 300;
+
     border: 1px solid rgba(255,255,255,0.15);
     cursor: pointer;
 
     transition: 0.25s ease;
-}
-
-.nav-circle:hover {
-    background: rgba(255,255,255,0.14);
-    transform: translateY(-50%) scale(1.08);
-}
-
-/* push them OUTSIDE the login box */
-.nav-circle.left {
-    left: calc(50% - 220px);
-}
-
-.nav-circle.right {
-    right: calc(50% - 220px);
-}
-
-/* arrow direction clarity */
-.nav-circle .arrow {
-    font-size: 26px;
-    color: white;
-    opacity: 0.9;
     user-select: none;
 }
 
-/* optional: slight directional bias */
-.nav-circle.left .arrow {
-    transform: translateX(-1px);
+/* hover polish */
+.nav-circle:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-50%) scale(1.08);
 }
 
-.nav-circle.right .arrow {
-    transform: translateX(1px);
+/* 🔥 KEY FIX: anchor to login box center, not screen edges */
+.login-box {
+    position: relative;
+}
+
+/* left & right spacing relative to login box */
+.nav-circle.left {
+    left: -90px;
+}
+
+.nav-circle.right {
+    right: -90px;
 }
     
 .overlay {
@@ -244,11 +239,11 @@ body {
 
         <!-- circular arrows -->
 <div class="nav-circle left" onclick="switchUser(-1)">
-    <div class="arrow">‹</div>
+    ‹
 </div>
 
 <div class="nav-circle right" onclick="switchUser(1)">
-    <div class="arrow">›</div>
+    ›
 </div>
 
         <div class="user">
