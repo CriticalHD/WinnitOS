@@ -31,53 +31,6 @@ body {
     filter: blur(12px) brightness(0.9);
 }
 
-.nav-circle {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(14px);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: rgba(255,255,255,0.9);
-    font-size: 28px;
-    font-weight: 300;
-
-    border: 1px solid rgba(255,255,255,0.15);
-    cursor: pointer;
-
-    transition: 0.25s ease;
-    user-select: none;
-}
-
-/* hover polish */
-.nav-circle:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateY(-50%) scale(1.08);
-}
-
-/* 🔥 KEY FIX: anchor to login box center, not screen edges */
-.login-box {
-    position: relative;
-}
-
-/* left & right spacing relative to login box */
-.nav-circle.left {
-    left: -90px;
-}
-
-.nav-circle.right {
-    right: -90px;
-}
-    
 .overlay {
     position: absolute;
     width: 100%;
@@ -148,6 +101,7 @@ body {
 /* user */
 .user {
     margin-bottom: 20px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .avatar {
@@ -157,32 +111,52 @@ body {
     background: center/cover;
     margin: 0 auto 10px;
     border: 2px solid rgba(255,255,255,0.25);
-    transition: transform 0.2s ease;
 }
 
-.username {
-    font-size: 18px;
+.label {
+    font-size: 16px;
     color: #e2e8f0;
+    opacity: 0.9;
 }
 
 /* arrows */
-.arrow {
+.nav-circle {
     position: absolute;
-    top: 70px;
-    font-size: 22px;
-    color: #e2e8f0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(14px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
+    color: white;
+
+    border: 1px solid rgba(255,255,255,0.15);
     cursor: pointer;
+
+    transition: 0.25s ease;
     user-select: none;
-    padding: 10px;
-    transition: transform 0.2s ease;
 }
 
-.arrow:hover {
-    transform: scale(1.2);
+.nav-circle:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-50%) scale(1.08);
 }
 
-.arrow.left { left: 10px; }
-.arrow.right { right: 10px; }
+.nav-circle.left {
+    left: -90px;
+}
+
+.nav-circle.right {
+    right: -90px;
+}
 
 .login-box input {
     display: block;
@@ -206,13 +180,33 @@ body {
     animation: shake 0.35s ease;
 }
 
-.login-box button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    background: #22c55e;
-    color: white;
-    cursor: pointer;
+/* carousel animations */
+.user.out-left {
+    animation: outLeft 0.25s ease forwards;
+}
+.user.out-right {
+    animation: outRight 0.25s ease forwards;
+}
+.user.in-left {
+    animation: inLeft 0.25s ease forwards;
+}
+.user.in-right {
+    animation: inRight 0.25s ease forwards;
+}
+
+@keyframes outLeft {
+    to { opacity: 0; transform: translateX(-35px) scale(0.95); filter: blur(2px); }
+}
+@keyframes outRight {
+    to { opacity: 0; transform: translateX(35px) scale(0.95); filter: blur(2px); }
+}
+@keyframes inLeft {
+    from { opacity: 0; transform: translateX(35px) scale(0.95); filter: blur(2px); }
+    to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+@keyframes inRight {
+    from { opacity: 0; transform: translateX(-35px) scale(0.95); filter: blur(2px); }
+    to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
 }
 
 @keyframes fadeIn {
@@ -237,18 +231,12 @@ body {
 <div class="login" id="login">
     <div class="login-box" id="loginBox">
 
-        <!-- circular arrows -->
-<div class="nav-circle left" onclick="switchUser(-1)">
-    ‹
-</div>
-
-<div class="nav-circle right" onclick="switchUser(1)">
-    ›
-</div>
+        <div class="nav-circle left" onclick="switchUser(-1)">‹</div>
+        <div class="nav-circle right" onclick="switchUser(1)">›</div>
 
         <div class="user">
             <div class="avatar" id="avatar"></div>
-            <div class="label" id="label">Default User</div>
+            <div class="label" id="label"></div>
         </div>
 
         <h2>Sign In</h2>
@@ -257,7 +245,6 @@ body {
     </div>
 </div>
 
-    
 <script>
 const users = [
     { label: "Default", avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
@@ -270,7 +257,7 @@ let currentUser = 0;
 /* background */
 const images = [
 "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920",
-"https://images.unsplash.com/photo-1493244040629-496f6d136cc3?w=1920",
+"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1920",
 "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1920",
 "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920"
 ];
@@ -278,39 +265,40 @@ const images = [
 document.getElementById("bg").style.backgroundImage =
 `url('${images[Math.floor(Math.random() * images.length)]}')`;
 
-/* update user UI */
-function updateUser(smooth = true) {
-    const userEl = document.querySelector(".user");
+/* render user */
+function renderUser() {
     const data = users[currentUser];
+    document.getElementById("avatar").style.backgroundImage = `url('${data.avatar}')`;
+    document.getElementById("label").innerText = data.label;
+}
 
-    if (smooth) {
-        userEl.style.opacity = "0";
-        userEl.style.transform = "translateY(10px) scale(0.98)";
+/* switch carousel */
+function switchUser(dir) {
+    const userEl = document.querySelector(".user");
+    const goingLeft = dir < 0;
+
+    userEl.classList.remove("in-left","in-right");
+    userEl.classList.add(goingLeft ? "out-right" : "out-left");
+
+    setTimeout(() => {
+        currentUser += dir;
+
+        if (currentUser < 0) currentUser = users.length - 1;
+        if (currentUser >= users.length) currentUser = 0;
+
+        renderUser();
+
+        userEl.classList.remove("out-left","out-right");
+        userEl.classList.add(goingLeft ? "in-left" : "in-right");
 
         setTimeout(() => {
-            document.getElementById("avatar").style.backgroundImage = `url('${data.avatar}')`;
-            document.getElementById("label").innerText = data.label;
+            userEl.classList.remove("in-left","in-right");
+        }, 260);
 
-            userEl.style.opacity = "1";
-            userEl.style.transform = "translateY(0) scale(1)";
-        }, 160);
-    } else {
-        document.getElementById("avatar").style.backgroundImage = `url('${data.avatar}')`;
-        document.getElementById("label").innerText = data.label;
-    }
+    }, 120);
 }
 
-/* switch users */
-function switchUser(dir) {
-    currentUser += dir;
-
-    if (currentUser < 0) currentUser = users.length - 1;
-    if (currentUser >= users.length) currentUser = 0;
-
-    updateUser(true);
-}
-
-/* boot -> login */
+/* boot */
 function continueBoot() {
     document.getElementById("boot").style.display = "none";
     document.getElementById("continueText").style.display = "none";
@@ -320,18 +308,18 @@ function continueBoot() {
 
     setTimeout(() => {
         login.classList.add("show");
-        updateUser(false);
+        renderUser();
     }, 50);
 }
 
-/* password blur focus */
+/* password focus blur */
 const password = document.getElementById("password");
 const bg = document.getElementById("bg");
 
 password.addEventListener("focus", () => bg.classList.add("focused"));
 password.addEventListener("blur", () => bg.classList.remove("focused"));
 
-/* login shake */
+/* fake login */
 function fakeLogin() {
     const box = document.getElementById("loginBox");
     box.classList.remove("shake");
