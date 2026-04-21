@@ -191,13 +191,13 @@ body {
     <div class="login-box" id="loginBox">
 
         <!-- circular arrows -->
-        <div class="nav-circle left" onclick="switchUser(-1)">
-            <div class="arrow">‹</div>
-        </div>
+<div class="nav-circle left" onclick="switchUser(-1)">
+    <div class="arrow">‹</div>
+</div>
 
-        <div class="nav-circle right" onclick="switchUser(1)">
-            <div class="arrow">›</div>
-        </div>
+<div class="nav-circle right" onclick="switchUser(1)">
+    <div class="arrow">›</div>
+</div>
 
         <div class="user">
             <div class="avatar" id="avatar"></div>
@@ -213,26 +213,32 @@ body {
     
 <script>
 const users = [
-    { name: "Default User", avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
-    { name: "Admin", avatar: "https://cdn-icons-png.flaticon.com/512/2202/2202112.png" },
-    { name: "Guest", avatar: "https://cdn-icons-png.flaticon.com/512/1144/1144760.png" }
-];
-
-let currentUser = 0;
-
-const users = [
     { label: "Default", avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
     { label: "Admin", avatar: "https://cdn-icons-png.flaticon.com/512/2202/2202112.png" },
     { label: "Guest", avatar: "https://cdn-icons-png.flaticon.com/512/1144/1144760.png" }
 ];
 
+let currentUser = 0;
+
+/* background */
+const images = [
+"https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920",
+"https://images.unsplash.com/photo-1493244040629-496f6d136cc3?w=1920",
+"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1920",
+"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920"
+];
+
+document.getElementById("bg").style.backgroundImage =
+`url('${images[Math.floor(Math.random() * images.length)]}')`;
+
+/* update user UI */
 function updateUser(smooth = true) {
     const userEl = document.querySelector(".user");
     const data = users[currentUser];
 
     if (smooth) {
         userEl.style.opacity = "0";
-        userEl.style.transform = "translateY(8px) scale(0.98)";
+        userEl.style.transform = "translateY(10px) scale(0.98)";
 
         setTimeout(() => {
             document.getElementById("avatar").style.backgroundImage = `url('${data.avatar}')`;
@@ -240,13 +246,14 @@ function updateUser(smooth = true) {
 
             userEl.style.opacity = "1";
             userEl.style.transform = "translateY(0) scale(1)";
-        }, 180);
+        }, 160);
     } else {
         document.getElementById("avatar").style.backgroundImage = `url('${data.avatar}')`;
         document.getElementById("label").innerText = data.label;
     }
 }
 
+/* switch users */
 function switchUser(dir) {
     currentUser += dir;
 
@@ -254,13 +261,6 @@ function switchUser(dir) {
     if (currentUser >= users.length) currentUser = 0;
 
     updateUser(true);
-}
-    const box = document.getElementById("loginBox");
-    box.style.transform = "scale(0.95)";
-    setTimeout(() => {
-        updateUser();
-        box.style.transform = "scale(1)";
-    }, 120);
 }
 
 /* boot -> login */
@@ -273,7 +273,7 @@ function continueBoot() {
 
     setTimeout(() => {
         login.classList.add("show");
-        updateUser();
+        updateUser(false);
     }, 50);
 }
 
@@ -284,53 +284,7 @@ const bg = document.getElementById("bg");
 password.addEventListener("focus", () => bg.classList.add("focused"));
 password.addEventListener("blur", () => bg.classList.remove("focused"));
 
-/* replace username style */
-.label {
-    font-size: 16px;
-    color: #e2e8f0;
-    opacity: 0.9;
-    letter-spacing: 0.3px;
-}
-
-/* circular nav buttons */
-.nav-circle {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: 0.25s ease;
-    border: 1px solid rgba(255,255,255,0.12);
-}
-
-.nav-circle:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateY(-50%) scale(1.08);
-}
-
-.nav-circle.left { left: 12px; }
-.nav-circle.right { right: 12px; }
-
-.nav-circle .arrow {
-    font-size: 20px;
-    color: white;
-    opacity: 0.9;
-    user-select: none;
-}
-
-/* smoother user switching */
-.user {
-    transition: transform 0.35s ease, opacity 0.35s ease;
-}
-    
-/* fake login shake */
+/* login shake */
 function fakeLogin() {
     const box = document.getElementById("loginBox");
     box.classList.remove("shake");
