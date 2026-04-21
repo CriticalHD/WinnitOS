@@ -3,32 +3,341 @@
 <head>
 <meta charset="UTF-8">
 <title>Winnit OS</title>
-<style>
-    body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: url('background.jpg') no-repeat center center/cover;
-        font-family: Arial, sans-serif;
-    }
 
-    .title {
-        font-size: 80px;
-        color: white;
-        text-align: center;
-        text-shadow: 
-            0 0 10px rgba(0,0,0,0.6),
-            0 0 20px rgba(0,0,0,0.5),
-            0 0 40px rgba(0,0,0,0.4);
-        font-weight: bold;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Cantarell', sans-serif;
+    cursor: pointer;
+}
+
+/* background */
+.bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px) brightness(1.2);
+    transform: scale(1.1);
+    transition: filter 0.4s ease;
+}
+
+.bg.focused {
+    filter: blur(12px) brightness(0.9);
+}
+
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(34,197,94,0.2), rgba(15,23,42,0.3));
+}
+
+/* boot */
+.boot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.title {
+    font-size: 96px;
+    color: #f1f5f9;
+    text-shadow: 0 6px 30px rgba(0,0,0,0.7),
+                 0 0 20px rgba(34,197,94,0.4);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 1.2s ease forwards;
+    animation-delay: 0.5s;
+}
+
+.continue {
+    position: absolute;
+    bottom: 40px;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    color: #e2e8f0;
+    opacity: 0;
+    animation: fadeIn 1.5s ease forwards;
+    animation-delay: 1.5s;
+}
+
+/* LOGIN */
+.login {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.login.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.login-box {
+    position: relative;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+    padding: 40px;
+    border-radius: 14px;
+    text-align: center;
+    color: white;
+    min-width: 260px;
+}
+
+/* user */
+.user {
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: center/cover;
+    margin: 0 auto 10px;
+    border: 2px solid rgba(255,255,255,0.25);
+    transition: transform 0.2s ease;
+}
+
+.username {
+    font-size: 18px;
+    color: #e2e8f0;
+}
+
+/* arrows */
+.arrow {
+    position: absolute;
+    top: 70px;
+    font-size: 22px;
+    color: #e2e8f0;
+    cursor: pointer;
+    user-select: none;
+    padding: 10px;
+    transition: transform 0.2s ease;
+}
+
+.arrow:hover {
+    transform: scale(1.2);
+}
+
+.arrow.left { left: 10px; }
+.arrow.right { right: 10px; }
+
+.login-box input {
+    display: block;
+    margin: 12px auto;
+    padding: 10px;
+    width: 220px;
+    border: none;
+    border-radius: 6px;
+    outline: none;
+}
+
+/* shake */
+@keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+}
+
+.login-box.shake {
+    animation: shake 0.35s ease;
+}
+
+.login-box button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #22c55e;
+    color: white;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
-<body>
 
-<div class="title">Winnit OS</div>
+<body onclick="continueBoot()">
+
+<div class="bg" id="bg"></div>
+<div class="overlay"></div>
+
+<!-- Boot -->
+<div class="boot" id="boot">
+    <div class="title">Winnit OS</div>
+</div>
+
+<div class="continue" id="continueText">Click to continue</div>
+
+<!-- Login -->
+<div class="login" id="login">
+    <div class="login-box" id="loginBox">
+
+        <!-- circular arrows -->
+        <div class="nav-circle left" onclick="switchUser(-1)">
+            <div class="arrow">‹</div>
+        </div>
+
+        <div class="nav-circle right" onclick="switchUser(1)">
+            <div class="arrow">›</div>
+        </div>
+
+        <div class="user">
+            <div class="avatar" id="avatar"></div>
+            <div class="label" id="label">Default User</div>
+        </div>
+
+        <h2>Sign In</h2>
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="fakeLogin()">Login</button>
+    </div>
+</div>
+
+    
+<script>
+const users = [
+    { name: "Default User", avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
+    { name: "Admin", avatar: "https://cdn-icons-png.flaticon.com/512/2202/2202112.png" },
+    { name: "Guest", avatar: "https://cdn-icons-png.flaticon.com/512/1144/1144760.png" }
+];
+
+let currentUser = 0;
+
+const users = [
+    { label: "Default", avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png" },
+    { label: "Admin", avatar: "https://cdn-icons-png.flaticon.com/512/2202/2202112.png" },
+    { label: "Guest", avatar: "https://cdn-icons-png.flaticon.com/512/1144/1144760.png" }
+];
+
+function updateUser(smooth = true) {
+    const userEl = document.querySelector(".user");
+    const data = users[currentUser];
+
+    if (smooth) {
+        userEl.style.opacity = "0";
+        userEl.style.transform = "translateY(8px) scale(0.98)";
+
+        setTimeout(() => {
+            document.getElementById("avatar").style.backgroundImage = `url('${data.avatar}')`;
+            document.getElementById("label").innerText = data.label;
+
+            userEl.style.opacity = "1";
+            userEl.style.transform = "translateY(0) scale(1)";
+        }, 180);
+    } else {
+        document.getElementById("avatar").style.backgroundImage = `url('${data.avatar}')`;
+        document.getElementById("label").innerText = data.label;
+    }
+}
+
+function switchUser(dir) {
+    currentUser += dir;
+
+    if (currentUser < 0) currentUser = users.length - 1;
+    if (currentUser >= users.length) currentUser = 0;
+
+    updateUser(true);
+}
+    const box = document.getElementById("loginBox");
+    box.style.transform = "scale(0.95)";
+    setTimeout(() => {
+        updateUser();
+        box.style.transform = "scale(1)";
+    }, 120);
+}
+
+/* boot -> login */
+function continueBoot() {
+    document.getElementById("boot").style.display = "none";
+    document.getElementById("continueText").style.display = "none";
+
+    const login = document.getElementById("login");
+    login.style.display = "flex";
+
+    setTimeout(() => {
+        login.classList.add("show");
+        updateUser();
+    }, 50);
+}
+
+/* password blur focus */
+const password = document.getElementById("password");
+const bg = document.getElementById("bg");
+
+password.addEventListener("focus", () => bg.classList.add("focused"));
+password.addEventListener("blur", () => bg.classList.remove("focused"));
+
+/* replace username style */
+.label {
+    font-size: 16px;
+    color: #e2e8f0;
+    opacity: 0.9;
+    letter-spacing: 0.3px;
+}
+
+/* circular nav buttons */
+.nav-circle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.25s ease;
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+.nav-circle:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.nav-circle.left { left: 12px; }
+.nav-circle.right { right: 12px; }
+
+.nav-circle .arrow {
+    font-size: 20px;
+    color: white;
+    opacity: 0.9;
+    user-select: none;
+}
+
+/* smoother user switching */
+.user {
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+    
+/* fake login shake */
+function fakeLogin() {
+    const box = document.getElementById("loginBox");
+    box.classList.remove("shake");
+    void box.offsetWidth;
+    box.classList.add("shake");
+}
+</script>
 
 </body>
 </html>
